@@ -17,9 +17,10 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 import httplib2
 from googleapiclient.discovery import build
 
+import base64
+import email as emaillib
 import anthropic
-from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
+from google_auth_httplib2 import AuthorizedHttp
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
@@ -27,11 +28,10 @@ BASE_DIR = Path(__file__).parent
 load_dotenv(BASE_DIR / ".env")
 
 ANTHROPIC_API_KEY  = os.environ["ANTHROPIC_API_KEY"]
-SLACK_BOT_TOKEN    = os.environ["SLACK_BOT_TOKEN"]
-SLACK_CHANNEL_ID   = "C0B16N4MDRQ"
-SLACK_MENTION_USER = "U059A6VD65T"
+SLACK_CHANNEL_EMAIL = "inbox-reports-aaaaucvaet3uf36uu63acifdni@wellcopyclien-aac5447.slack.com"
+GMAIL_FROM          = "max@wellcopy.net"
 
-GMAIL_SCOPES         = ["https://www.googleapis.com/auth/gmail.readonly"]
+GMAIL_SCOPES         = ["https://www.googleapis.com/auth/gmail.modify"]
 GOOGLE_CREDS_FILE    = BASE_DIR / "google_credentials.json"
 GOOGLE_TOKEN_FILE    = BASE_DIR / "google_token.json"
 
@@ -101,7 +101,6 @@ def get_gmail_service():
             creds = flow.credentials
         with open(GOOGLE_TOKEN_FILE, "w") as f:
             f.write(creds.to_json())
-    from google_auth_httplib2 import AuthorizedHttp
     http = AuthorizedHttp(creds, http=httplib2.Http(disable_ssl_certificate_validation=True))
     return build("gmail", "v1", http=http)
 
@@ -184,9 +183,9 @@ Be strict. When in doubt, exclude. Only flag actionable emails where a real huma
     return json.loads(text.strip())
 
 
-# ── Slack ─────────────────────────────────────────────────────────────────────
+# ── Post report via Gmail → Slack email integration ───────────────────────────
 
-def post_report(categorised):
+def post_report(categorised, service):
     et = pytz.timezone("America/New_York")
     now = datetime.datetime.now(et)
     date_str = now.strftime("%B %-d, %Y")
@@ -195,34 +194,34 @@ def post_report(categorised):
     actionable = categorised.get("actionable", [])
     cold       = categorised.get("cold_emails", [])
 
-    lines = [f"<@{SLACK_MENTION_USER}> *Inbox Report — {date_str} ({time_str})*\n"]
+    lines = [f"Inbox Report — {date_str} ({time_str})\n"]
 
-    lines.append("*Actionable Emails*\n")
+    lines.append("Actionable Emails\n")
     if actionable:
         for i, item in enumerate(actionable, 1):
-            lines.append(
-                f"{i}. *{item['subject']}* | {item['from_email']} | {item['action_needed']}"
-            )
+            lines.append(f"{i}. {item['subject']} | {item['from_email']} | {item['action_needed']}")
     else:
-        lines.append("_No actionable emails._")
+        lines.append("No actionable emails.")
 
-    lines.append(f"\n---\n\n*Cold Email Count: {len(cold)}*")
+    lines.append(f"\nCold Email Count: {len(cold)}")
     if cold:
         cold_list = ", ".join(f"{c['from_email']} ({c['pitch_summary']})" for c in cold)
         lines.append(cold_list)
 
-    lines.append("\n---")
-    lines.append("_Reports run at 7 AM & 3 PM ET, Mon–Fri_")
+    lines.append("\nReports run at 7 AM & 3 PM ET, Mon–Fri")
 
-    message = "\n".join(lines)
+    body = "\n".join(lines)
+    subject = f"Inbox Report — {date_str} ({time_str})"
 
-    client = WebClient(token=SLACK_BOT_TOKEN)
-    try:
-        client.chat_postMessage(channel=SLACK_CHANNEL_ID, text=message)
-        print(f"[{now.strftime('%Y-%m-%d %H:%M ET')}] Report posted successfully.")
-    except SlackApiError as e:
-        print(f"Slack error: {e.response['error']}")
-        raise
+    msg = emaillib.message.EmailMessage()
+    msg["To"] = SLACK_CHANNEL_EMAIL
+    msg["From"] = GMAIL_FROM
+    msg["Subject"] = subject
+    msg.set_content(body)
+
+    raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+    service.users().messages().send(userId="me", body={"raw": raw}).execute()
+    print(f"[{now.strftime('%Y-%m-%d %H:%M ET')}] Report sent to Slack channel via email.")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -234,7 +233,7 @@ def main():
     print(f"Fetched {len(threads)} threads. Categorising...")
     categorised = categorise_emails(threads)
     print(f"Actionable: {len(categorised.get('actionable',[]))}  Cold: {len(categorised.get('cold_emails',[]))}")
-    post_report(categorised)
+    post_report(categorised, service)
 
 
 if __name__ == "__main__":

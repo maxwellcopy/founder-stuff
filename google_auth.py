@@ -6,7 +6,7 @@ from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-GMAIL_SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+GMAIL_SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 BASE_DIR = Path(__file__).parent
 GOOGLE_CREDS_FILE = BASE_DIR / "google_credentials.json"
 GOOGLE_TOKEN_FILE = BASE_DIR / "google_token.json"
