@@ -90,9 +90,12 @@ def get_gmail_service():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(str(GOOGLE_CREDS_FILE), GMAIL_SCOPES)
-            auth_url, _ = flow.authorization_url(prompt="consent")
+            flow.redirect_uri = "http://localhost"
+            auth_url, _ = flow.authorization_url(prompt="consent", access_type="offline")
             print(f"\nOpen this URL in your browser:\n\n{auth_url}\n")
-            code = input("Paste the authorization code here: ")
+            redirected = input("After approving, paste the full URL you were redirected to: ")
+            from urllib.parse import urlparse, parse_qs
+            code = parse_qs(urlparse(redirected).query)["code"][0]
             flow.fetch_token(code=code)
             creds = flow.credentials
         with open(GOOGLE_TOKEN_FILE, "w") as f:
