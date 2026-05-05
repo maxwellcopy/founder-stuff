@@ -18,7 +18,7 @@ import httplib2
 from googleapiclient.discovery import build
 
 import base64
-import email as emaillib
+import requests
 import anthropic
 from google_auth_httplib2 import AuthorizedHttp
 
@@ -28,8 +28,10 @@ BASE_DIR = Path(__file__).parent
 load_dotenv(BASE_DIR / ".env")
 
 ANTHROPIC_API_KEY  = os.environ["ANTHROPIC_API_KEY"]
-SLACK_CHANNEL_EMAIL = "inbox-reports-aaaaucvaet3uf36uu63acifdni@wellcopyclien-aac5447.slack.com"
-GMAIL_FROM          = "max@wellcopy.net"
+GITHUB_PAT         = os.environ["GITHUB_PAT"]
+GITHUB_REPO        = "maxwellcopy/founder-stuff"
+GITHUB_BRANCH      = "claude/gmail-slack-email-reports-YegU5"
+REPORT_PATH        = "reports/latest.json"
 
 GMAIL_SCOPES         = ["https://www.googleapis.com/auth/gmail.modify"]
 GOOGLE_CREDS_FILE    = BASE_DIR / "google_credentials.json"
@@ -185,7 +187,7 @@ Be strict. When in doubt, exclude. Only flag actionable emails where a real huma
     return json.loads(text.strip())
 
 
-# ── Post report via Gmail → Slack email integration ───────────────────────────
+# ── Post report via GitHub → GitHub Actions → Slack ───────────────────────────
 
 def post_report(categorised, service):
     et = pytz.timezone("America/New_York")
@@ -193,37 +195,30 @@ def post_report(categorised, service):
     date_str = now.strftime("%B %-d, %Y")
     time_str = now.strftime("%-I:%M %p ET")
 
-    actionable = categorised.get("actionable", [])
-    cold       = categorised.get("cold_emails", [])
+    payload = {
+        "date_str": date_str,
+        "time_str": time_str,
+        "actionable": categorised.get("actionable", []),
+        "cold_emails": categorised.get("cold_emails", []),
+    }
+    content = base64.b64encode(json.dumps(payload, indent=2).encode()).decode()
 
-    lines = [f"Inbox Report — {date_str} ({time_str})\n"]
+    headers = {"Authorization": f"token {GITHUB_PAT}", "Accept": "application/vnd.github.v3+json"}
+    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{REPORT_PATH}"
 
-    lines.append("Actionable Emails\n")
-    if actionable:
-        for i, item in enumerate(actionable, 1):
-            lines.append(f"{i}. {item['subject']} | {item['from_email']} | {item['action_needed']}")
+    existing = requests.get(api_url, headers=headers, params={"ref": GITHUB_BRANCH}).json()
+    sha = existing.get("sha")
+
+    body = {"message": f"Inbox report {now.strftime('%Y-%m-%d %H:%M ET')}", "content": content, "branch": GITHUB_BRANCH}
+    if sha:
+        body["sha"] = sha
+
+    r = requests.put(api_url, headers=headers, json=body)
+    if r.status_code in (200, 201):
+        print(f"[{now.strftime('%Y-%m-%d %H:%M ET')}] Report pushed to GitHub — Actions will post to Slack.")
     else:
-        lines.append("No actionable emails.")
-
-    lines.append(f"\nCold Email Count: {len(cold)}")
-    if cold:
-        cold_list = ", ".join(f"{c['from_email']} ({c['pitch_summary']})" for c in cold)
-        lines.append(cold_list)
-
-    lines.append("\nReports run at 7 AM & 3 PM ET, Mon–Fri")
-
-    body = "\n".join(lines)
-    subject = f"Inbox Report — {date_str} ({time_str})"
-
-    msg = emaillib.message.EmailMessage()
-    msg["To"] = SLACK_CHANNEL_EMAIL
-    msg["From"] = GMAIL_FROM
-    msg["Subject"] = subject
-    msg.set_content(body)
-
-    raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
-    service.users().messages().send(userId="me", body={"raw": raw}).execute()
-    print(f"[{now.strftime('%Y-%m-%d %H:%M ET')}] Report sent to Slack channel via email.")
+        print(f"GitHub error: {r.status_code} {r.text}")
+        raise RuntimeError("Failed to push report to GitHub")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
