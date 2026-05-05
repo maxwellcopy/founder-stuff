@@ -2,7 +2,7 @@
 import json
 import os
 import sys
-import requests
+import urllib.request
 
 with open("reports/latest.json") as f:
     data = json.load(f)
@@ -29,17 +29,28 @@ lines.append("_Reports run at 7 AM & 3 PM ET, Mon–Fri_")
 
 message = "\n".join(lines)
 
-token = os.environ["SLACK_BOT_TOKEN"]
-r = requests.post(
+token = os.environ.get("SLACK_BOT_TOKEN", "").strip()
+if not token:
+    print("ERROR: SLACK_BOT_TOKEN is empty or not set")
+    sys.exit(1)
+
+print(f"Token present: yes, length={len(token)}, starts with={token[:5]}")
+
+payload = json.dumps({"channel": "C0B16N4MDRQ", "text": message}).encode("utf-8")
+req = urllib.request.Request(
     "https://slack.com/api/chat.postMessage",
-    headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
-    json={"channel": "C0B16N4MDRQ", "text": message},
+    data=payload,
+    headers={
+        "Authorization": "Bearer " + token,
+        "Content-Type": "application/json",
+    },
+    method="POST",
 )
 
-print(f"Status: {r.status_code}")
-print(f"Response: {r.text}")
+with urllib.request.urlopen(req) as resp:
+    result = json.loads(resp.read().decode("utf-8"))
 
-result = r.json()
+print(f"Slack ok: {result.get('ok')}")
 if result.get("ok"):
     print("Posted to Slack successfully.")
 else:
