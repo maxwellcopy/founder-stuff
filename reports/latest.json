@@ -1,68 +1,73 @@
 {
   "date_str": "May 5, 2026",
-  "time_str": "3:20 PM ET",
+  "time_str": "3:23 PM ET",
   "actionable": [
     {
       "subject": "RE: Well Copy Proposal",
       "from_email": "mhughes@plushbeds.com",
-      "action_needed": "Michael Hughes at PlushBeds has reviewed the proposal video and is asking about the process and timeline to be up and running before Memorial Weekend \u2014 Max needs to respond with onboarding details."
-    },
-    {
-      "subject": "Re: Well Copy Account Management Role - Trial assignment",
-      "from_email": "cosovicirma@gmail.com",
-      "action_needed": "Irma has submitted her trial assignment for the Account Management role and is waiting for Max's review and feedback."
-    },
-    {
-      "subject": "noah and max",
-      "from_email": "noahbeneteau32@gmail.com",
-      "action_needed": "Noah Beneteau is following up on his email copywriter application from last week and is waiting to hear if the position is still open."
+      "action_needed": "Michael Hughes has reviewed the video and is asking Max to walk him through the process and timeframe to get up and running before Memorial Weekend \u2014 Max needs to respond with onboarding details."
     },
     {
       "subject": "Fwd: Shawn Killens sent you a message",
       "from_email": "michael@wellcopy.net",
-      "action_needed": "Michael Lafata forwarded an inbound message from Shawn Killens via Skool and is asking Max how to handle it \u2014 Max needs to advise Michael on next steps."
+      "action_needed": "Michael Lafata is forwarding an inbound message from Shawn Killens via Skool and asking Max how he should respond \u2014 Max needs to give Michael guidance."
+    },
+    {
+      "subject": "Re: Well Copy Account Management Role - Trial assignment",
+      "from_email": "cosovicirma@gmail.com",
+      "action_needed": "Job applicant Irma has submitted her completed trial assignment and is waiting on Max (and team) to review it."
+    },
+    {
+      "subject": "noah and max",
+      "from_email": "noahbeneteau32@gmail.com",
+      "action_needed": "Noah Beneteau is following up on his email copywriter application from last week and is waiting to hear back from Max."
+    },
+    {
+      "subject": "Re: max, can we talk?",
+      "from_email": "max@wellcopy.net",
+      "action_needed": "Max already replied to Kelly LeVeque confirming he's looking forward to talking \u2014 verify no further response is needed or if a next step (e.g., call scheduling) is pending on Max's end."
     }
   ],
   "cold_emails": [
     {
-      "from_email": "francis@francisyang@headaipushzone.com",
-      "pitch_summary": "Unsolicited paid brand collaboration pitch for Comulytic (follow-up)."
-    },
-    {
-      "from_email": "francis.yang@headaibrandzone.net",
-      "pitch_summary": "Unsolicited paid content collaboration pitch for Pippit AI on Instagram Reels (follow-up)."
+      "from_email": "francisyang@headaipushzone.com",
+      "pitch_summary": "Paid brand collaboration pitch for Comulytic on Instagram Reels \u2014 repeated follow-up."
     },
     {
       "from_email": "yang.francis@headaimarknow.com",
-      "pitch_summary": "Unsolicited paid collab pitch for Comulytic (another follow-up from same sender)."
+      "pitch_summary": "Same Comulytic paid collab pitch from a different domain \u2014 follow-up."
+    },
+    {
+      "from_email": "francis.yang@headaibrandzone.net",
+      "pitch_summary": "Same Comulytic/Pippit AI paid collab pitch from yet another domain \u2014 final follow-up."
     },
     {
       "from_email": "rimjhimagrahari139@gmail.com",
-      "pitch_summary": "Unsolicited pitch from a Sales Ops/GTM specialist seeking a role at Well Copy."
-    },
-    {
-      "from_email": "jack@athelionco.info",
-      "pitch_summary": "Unsolicited lead generation pitch offering to book 25+ calls with business owners onto Max's calendar monthly."
+      "pitch_summary": "Freelancer pitching Sales Ops / GTM infrastructure services using Clay, Scaledmail, Zapmail."
     },
     {
       "from_email": "f-s@whosaidinfra.com",
-      "pitch_summary": "Unsolicited cold outreach pitching 150 free email mailboxes and email infrastructure services."
+      "pitch_summary": "Cold outreach pitching 150 free email inboxes / cold outreach infrastructure."
     },
     {
-      "from_email": "krishna.g@emergent.sh",
-      "pitch_summary": "Unsolicited paid creator collaboration pitch from Emergent AI."
-    },
-    {
-      "from_email": "vyrlo@nanocorp.app",
-      "pitch_summary": "Unsolicited cold outreach likely pitching a tool or service, using Max's funnel video as a hook."
-    },
-    {
-      "from_email": "advisor@flippa.com",
-      "pitch_summary": "Unsolicited pitch from Flippa offering to help Max sell wellcopy.net."
+      "from_email": "jack@athelionco.info",
+      "pitch_summary": "Agency pitching calendar booking service claiming 25+ calls/month with business owners."
     },
     {
       "from_email": "rebeccabrown.d@mightynetworkshq.info",
-      "pitch_summary": "Unsolicited outreach pitching a network or monetization opportunity targeting YouTubers and online marketing experts."
+      "pitch_summary": "Pitching a community or monetization platform targeting YouTubers and online marketing experts."
+    },
+    {
+      "from_email": "krishna.g@emergent.sh",
+      "pitch_summary": "Pitching a paid creator collaboration with Emergent AI."
+    },
+    {
+      "from_email": "advisor@flippa.com",
+      "pitch_summary": "Flippa advisor pitching Max on selling wellcopy.net."
+    },
+    {
+      "from_email": "vyrlo@nanocorp.app",
+      "pitch_summary": "Unsolicited outreach referencing Max's YouTube content, likely pitching a tool or service."
     }
   ]
 }
