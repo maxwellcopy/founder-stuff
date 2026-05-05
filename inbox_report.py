@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
+import httplib2
 from googleapiclient.discovery import build
 
 import anthropic
@@ -100,7 +101,9 @@ def get_gmail_service():
             creds = flow.credentials
         with open(GOOGLE_TOKEN_FILE, "w") as f:
             f.write(creds.to_json())
-    return build("gmail", "v1", credentials=creds)
+    from google_auth_httplib2 import AuthorizedHttp
+    http = AuthorizedHttp(creds, http=httplib2.Http(disable_ssl_certificate_validation=True))
+    return build("gmail", "v1", http=http)
 
 
 def fetch_threads(service, max_pages=3):
