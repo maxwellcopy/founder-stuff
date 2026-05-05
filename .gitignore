@@ -35,6 +35,9 @@ yarn-debug.log*
 *.key
 credentials.json
 service-account.json
+google_credentials.json
+google_token.json
+settings.local.json
 
 # Misc
 .cache/
