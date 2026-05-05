@@ -45,7 +45,8 @@ GMAIL_QUERY = (
     "-from:notification@slack.com -from:no-reply@slack.com "
     "-from:notifications@calendly.com -from:noreply@github.com "
     "-from:noreply@smartsuite.com -from:mailer@shopify.com "
-    "-from:osos-corps@sos.wa.gov -from:no-reply@klaviyo.com"
+    "-from:osos-corps@sos.wa.gov -from:no-reply@klaviyo.com "
+    "-from:no-reply-forms@webflow.com"
 )
 
 EXCLUSION_RULES = """
@@ -59,6 +60,7 @@ EXCLUDE these email types — do not include them in either list:
 - Newsletters, marketing emails, product update digests
 - Receipts, invoices, subscription renewal reminders
 - Automated platform notifications (Slack digest emails, GitHub token alerts, Notion updates, SmartSuite automations)
+- Webflow form submission notifications (automated no-reply-forms@webflow.com emails)
 - Internal team calendar invites (from @wellcopy.net senders)
 - Time-off requests or internal approvals
 - Supercut.ai "first view" notifications
