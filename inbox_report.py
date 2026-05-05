@@ -90,7 +90,11 @@ def get_gmail_service():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(str(GOOGLE_CREDS_FILE), GMAIL_SCOPES)
-            creds = flow.run_local_server(port=0)
+            auth_url, _ = flow.authorization_url(prompt="consent")
+            print(f"\nOpen this URL in your browser:\n\n{auth_url}\n")
+            code = input("Paste the authorization code here: ")
+            flow.fetch_token(code=code)
+            creds = flow.credentials
         with open(GOOGLE_TOKEN_FILE, "w") as f:
             f.write(creds.to_json())
     return build("gmail", "v1", credentials=creds)
